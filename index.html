@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="color-scheme" content="dark"/>
+<meta name="theme-color" content="#0c1322"/>
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
+<title>Tiempo en el trayecto San Rogelio → CEPA Tetuán</title>
+<style>
+:root{
+  --ink:#0c1322; --ink-2:#0a1018; --surface:#131e33; --surface-2:#1a2740;
+  --line:#26344f; --line-soft:#1d2a44;
+  --text:#eef3fb; --muted:#90a0bd; --faint:#65769a;
+  --sun:#ffb454; --sky:#5ec8ff;
+  --ok:#3ddc97; --warn:#ffc24b; --bad:#ff6b6b;
+  --r:14px; --r-sm:10px;
+  --mono:ui-monospace,"SF Mono","Cascadia Code","JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;}
+body{
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(94,200,255,.07), transparent 60%),
+    radial-gradient(900px 500px at -10% 0%, rgba(255,180,84,.06), transparent 55%),
+    var(--ink);
+  color:var(--text);font-family:var(--sans);min-height:100vh;font-size:15px;line-height:1.45;
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+
+header{
+  display:flex;align-items:center;gap:13px;padding:16px 20px;
+  border-bottom:1px solid var(--line-soft);position:sticky;top:0;z-index:50;
+  background:rgba(10,16,24,.85);backdrop-filter:blur(10px);
+}
+.logo{width:38px;height:38px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
+  font-size:20px;background:linear-gradient(135deg,var(--sun),#ff8a4b);box-shadow:0 6px 18px rgba(255,140,75,.28);}
+.brand{flex:1;min-width:0;}
+.brand h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.2px;}
+.brand p{margin:1px 0 0;font-size:12px;color:var(--muted);}
+.refresh{width:40px;height:40px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2);
+  color:var(--text);font-size:18px;cursor:pointer;flex:0 0 auto;transition:border-color .15s,transform .4s;}
+.refresh:hover{border-color:var(--sky);}
+.refresh.spin{animation:spin .8s linear infinite;}
+
+.controls{padding:16px 20px 6px;max-width:1400px;margin:0 auto;}
+.times{display:flex;gap:10px;flex-wrap:wrap;}
+.time-btn{flex:1 1 auto;min-width:96px;padding:12px 14px;border-radius:var(--r-sm);
+  border:1px solid var(--line);background:var(--surface);color:var(--text);
+  font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;
+  flex-direction:column;align-items:center;gap:2px;}
+.time-btn small{font-size:10px;font-weight:600;color:var(--faint);letter-spacing:.3px;}
+.time-btn:hover{border-color:var(--sky);}
+.time-btn.active{background:linear-gradient(135deg,var(--sky),#7af0c1);color:#10203a;border-color:transparent;
+  box-shadow:0 6px 18px rgba(94,200,255,.28);}
+.time-btn.active small{color:#10203a;opacity:.7;}
+.time-btn .roll{display:none;}
+.time-btn.willroll .roll{display:inline;}
+
+.target-banner{max-width:1400px;margin:14px auto 0;padding:0 20px;}
+.target-banner .inner{display:flex;align-items:center;gap:11px;padding:12px 16px;border-radius:var(--r);
+  border:1px solid var(--line);background:var(--surface);}
+.target-banner .ico{font-size:22px;}
+.target-banner b{color:var(--sky);}
+.target-banner .tom{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;
+  background:var(--sun);color:#10203a;font-size:11px;font-weight:800;letter-spacing:.4px;}
+
+.container{max-width:1400px;margin:0 auto;padding:16px 20px 28px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+
+.card{background:linear-gradient(180deg,var(--surface) 0%, #0f1830 100%);
+  border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 30px rgba(2,8,24,.35);
+  overflow:hidden;display:flex;flex-direction:column;}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.loc-name{font-size:15px;font-weight:700;color:var(--text);}
+.tag{display:inline-block;margin-left:7px;padding:2px 8px;border-radius:999px;font-size:10px;
+  font-weight:800;letter-spacing:.5px;vertical-align:middle;color:#10203a;background:var(--sky);}
+.tag.end{background:var(--ok);}
+.loc-time{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px;}
+.loc-time .d{color:var(--sun);}
+.card-body{padding:16px;flex:1;}
+
+.wmain{display:flex;align-items:center;gap:14px;margin-bottom:15px;}
+.wmain .ico{font-size:50px;line-height:1;}
+.wmain .desc{font-size:16px;font-weight:700;color:var(--sky);}
+.therm{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:999px;font-size:11px;
+  font-weight:800;letter-spacing:.5px;color:#0c1322;}
+
+.temps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.tbox{background:var(--ink-2);border:1px solid var(--line-soft);border-radius:var(--r-sm);padding:11px;text-align:center;}
+.tbox .k{font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--faint);}
+.tbox .v{font-family:var(--mono);font-size:23px;font-weight:700;margin-top:3px;color:var(--sky);}
+.tbox .v.feels{color:var(--ok);}
+.tbox .v.rain{color:var(--sun);}
+
+.specs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px;}
+.spec{background:var(--ink-2);border:1px solid var(--line-soft);border-radius:8px;padding:9px 6px;text-align:center;}
+.spec .k{font-size:9px;letter-spacing:.3px;text-transform:uppercase;color:var(--faint);}
+.spec .v{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);margin-top:3px;}
+.arrow{display:inline-block;}
+
+.evo-btn{width:100%;padding:11px;border-radius:var(--r-sm);border:1px solid var(--line);
+  background:var(--surface-2);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;transition:border-color .15s;}
+.evo-btn:hover{border-color:var(--sky);}
+
+.skeleton .sk{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-2) 37%,var(--surface) 63%);
+  background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:100% 0;}100%{background-position:-100% 0;}}
+
+.err{background:#2a1620;border:1px solid #5a2d3a;border-radius:var(--r-sm);color:#ffb0bc;
+  padding:14px;text-align:center;font-size:13px;}
+.retry{margin-top:10px;padding:8px 14px;border-radius:8px;background:var(--surface-2);
+  border:1px solid var(--line);color:var(--text);font-size:13px;cursor:pointer;}
+
+/* Modal */
+.overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
+  padding:18px;background:rgba(6,10,18,.86);backdrop-filter:blur(6px);}
+.overlay.on{display:flex;animation:fade .2s ease;}
+@keyframes fade{from{opacity:0;}to{opacity:1;}}
+.modal{background:linear-gradient(180deg,var(--surface) 0%, #0f1830 100%);border:1px solid var(--line);
+  border-radius:18px;max-width:760px;width:100%;max-height:88vh;overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.6);display:flex;flex-direction:column;animation:rise .25s ease;}
+@keyframes rise{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}
+.modal-head{padding:16px 18px;border-bottom:1px solid var(--line-soft);display:flex;
+  align-items:center;justify-content:space-between;gap:12px;}
+.modal-head h3{margin:0;font-size:16px;color:var(--sky);}
+.modal-head .close{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--text);font-size:20px;cursor:pointer;transition:transform .2s;}
+.modal-head .close:hover{transform:rotate(90deg);}
+.modal-body{padding:16px 8px 16px 16px;overflow-x:auto;}
+.evo{display:flex;gap:0;min-width:min-content;}
+.eh{flex:0 0 70px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 2px;
+  border-radius:var(--r-sm);position:relative;}
+.eh.now{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--sky);}
+.eh .hr{font-family:var(--mono);font-size:11px;color:var(--muted);}
+.eh .hr .d{color:var(--sun);font-weight:700;}
+.eh .i{font-size:22px;}
+.eh .t{font-family:var(--mono);font-size:14px;font-weight:700;}
+.eh .rb{width:30px;height:26px;background:var(--ink-2);border:1px solid var(--line-soft);border-radius:5px;
+  display:flex;align-items:flex-end;overflow:hidden;}
+.eh .rb i{display:block;width:100%;background:var(--sky);}
+.eh .rp{font-family:var(--mono);font-size:10px;color:var(--faint);}
+
+#toasts{position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:2000;
+  display:flex;flex-direction:column;gap:8px;width:min(420px,92vw);}
+.toast{padding:12px 15px;border-radius:var(--r-sm);font-size:13px;font-weight:600;
+  box-shadow:0 10px 26px rgba(0,0,0,.45);}
+.toast.err{background:#2a1620;border:1px solid #5a2d3a;color:#ffb0bc;}
+.toast.ok{background:#13261d;border:1px solid #2d5a42;color:#a7f0c8;}
+
+.spinner{width:22px;height:22px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--sky);
+  border-radius:50%;animation:spin .8s linear infinite;margin:0 auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;
+  padding:34px 16px;color:var(--muted);font-size:13px;}
+:focus-visible{outline:2px solid var(--sky);outline-offset:2px;}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+@media (max-width:480px){
+  header{padding:12px 14px;}.controls{padding:12px 14px 4px;}.container{padding:14px;}
+  .target-banner{padding:0 14px;}.specs{grid-template-columns:repeat(4,1fr);}
+}
+
+/* ===== MAPA ===== */
+[hidden]{display:none!important;}
+.map-btn{width:100%;margin-top:10px;padding:12px;border-radius:var(--r-sm);border:1px solid var(--line);
+  background:var(--surface);color:var(--text);font-size:14px;font-weight:800;letter-spacing:.6px;
+  cursor:pointer;transition:all .15s;}
+.map-btn:hover{border-color:var(--sky);}
+.map-btn.on{background:linear-gradient(135deg,var(--sky),#7af0c1);color:#10203a;border-color:transparent;
+  box-shadow:0 6px 18px rgba(94,200,255,.28);}
+.map{position:relative;height:min(72vh,640px);min-height:360px;border:1px solid var(--line);
+  border-radius:var(--r);overflow:hidden;background:var(--ink-2);touch-action:none;cursor:grab;}
+.map.drag{cursor:grabbing;}
+.map .tiles{position:absolute;inset:0;}
+.map .tiles img{position:absolute;user-select:none;-webkit-user-drag:none;
+  filter:saturate(.72) brightness(.82) contrast(1.06);}
+.map svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.map svg .rt-b{fill:none;stroke:#070c16;stroke-width:8;stroke-linejoin:round;stroke-linecap:round;opacity:.85;}
+.map svg .rt{fill:none;stroke:var(--sky);stroke-width:3.5;stroke-linejoin:round;stroke-linecap:round;}
+.map svg .lk{stroke:var(--line);stroke-width:1.6;}
+.pins{position:absolute;inset:0;}
+.pin{position:absolute;width:0;height:0;cursor:pointer;}
+.pin .dot{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;
+  background:var(--sky);box-shadow:0 0 0 2px var(--ink);}
+.pin.fin .dot{background:var(--ok);}
+.pin .bub{position:absolute;display:flex;flex-direction:column;gap:3px;padding:5px 7px;
+  border-radius:9px;white-space:nowrap;background:rgba(19,30,51,.96);border:1px solid var(--line);
+  box-shadow:0 4px 12px rgba(0,0,0,.5);line-height:1.15;}
+.pin .l1{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;}
+.pin .n{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+  background:var(--faint);color:#0c1322;font-size:9px;font-weight:900;}
+.pin.ini .n{background:var(--sky);}
+.pin.fin .n{background:var(--ok);}
+.pin .tv{font-family:var(--mono);}
+.pin .rain{font-family:var(--mono);color:var(--sun);}
+.pin .l2{border-radius:6px;padding:1px 4px;text-align:center;color:#0c1322;
+  font-size:9px;font-weight:900;letter-spacing:.4px;}
+.pin.sel{z-index:20;}
+.pin.sel .bub{border-color:var(--sky);box-shadow:0 0 0 1px var(--sky),0 6px 18px rgba(0,0,0,.6);}
+.mapctl{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:6px;z-index:30;}
+.mapctl button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);
+  background:rgba(19,30,51,.94);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;}
+.mapctl button:hover{border-color:var(--sky);}
+.attrib{position:absolute;left:0;bottom:0;z-index:30;padding:3px 9px;font-size:10px;
+  background:rgba(10,16,24,.82);color:var(--faint);border-top-right-radius:8px;}
+.attrib a{color:var(--faint);}
+.mapinfo{margin-top:12px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--surface);font-size:13px;color:var(--muted);}
+.mapinfo .t{font-size:15px;font-weight:700;color:var(--text);}
+.mapinfo .sub{font-family:var(--mono);font-size:12px;margin-top:2px;}
+.mapinfo .row{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:9px;}
+.mapinfo .row b{color:var(--text);font-family:var(--mono);}
+.mapinfo .evo2{margin-top:11px;padding:9px 13px;border-radius:9px;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;}
+.mapinfo .evo2:hover{border-color:var(--sky);}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🚶</div>
+  <div class="brand">
+    <h1>Trayecto San Rogelio → CEPA Tetuán</h1>
+    <p id="clock">Cargando…</p>
+  </div>
+  <button class="refresh" id="refresh" title="Actualizar datos" aria-label="Actualizar">↻</button>
+</header>
+
+<div class="controls">
+  <div class="times" id="times"></div>
+  <button class="map-btn" id="mapBtn">🗺️ MAPA</button>
+</div>
+<div class="target-banner"><div class="inner">
+  <span class="ico">🕒</span>
+  <div id="targetText">—</div>
+</div></div>
+
+<div class="container" id="cardsWrap"><div class="grid" id="grid"></div></div>
+
+<div class="container" id="mapWrap" hidden>
+  <div class="map" id="map">
+    <div class="tiles" id="tiles"></div>
+    <svg id="mapSvg" aria-hidden="true"></svg>
+    <div class="pins" id="pins"></div>
+    <div class="mapctl">
+      <button id="zIn"  title="Acercar" aria-label="Acercar">+</button>
+      <button id="zOut" title="Alejar"  aria-label="Alejar">−</button>
+      <button id="zFit" title="Ver todo el trayecto" aria-label="Ajustar">⤢</button>
+    </div>
+    <div class="attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</div>
+  </div>
+  <div class="mapinfo" id="mapInfo"></div>
+</div>
+
+<div class="overlay" id="overlay"><div class="modal">
+  <div class="modal-head"><h3 id="modalTitle">Evolución</h3>
+    <button class="close" id="modalClose" aria-label="Cerrar">×</button></div>
+  <div class="modal-body" id="modalBody"></div>
+</div></div>
+
+<div id="toasts"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   PUNTOS FIJOS  (edítalos aquí si quieres otros lugares)
+   ===================================================================== */
+const LOCATIONS = [
+  { name:'Calle de San Rogelio',              lat:40.4515, lon:-3.7099, tag:'INICIO' },
+  { name:'Jerónima Llorente · Francos Rodríguez', lat:40.4566, lon:-3.7045 },
+  { name:'Plaza del Canal de Isabel II',      lat:40.4581, lon:-3.7016 },
+  { name:'Hierbabuena · Marqués de Viana',    lat:40.4619, lon:-3.7004 },
+  { name:'Müller · Capitán Blanco Argibay',   lat:40.4653, lon:-3.6982 },
+  { name:'Müller · Pinos Alta',               lat:40.4671, lon:-3.6972 },
+  { name:'CEPA Tetuán · Pinos Alta, 63',      lat:40.4680, lon:-3.6983, tag:'FINAL' }
+];
+const TIME_VIEWS = [
+  {id:'now',   label:'Ahora', sub:'🕐'},
+  {id:'09:00', label:'09:00', sub:'🌅'},
+  {id:'15:00', label:'15:00', sub:'☀️'},
+  {id:'21:00', label:'21:00', sub:'🌙'}
+];
+
+/* =====================================================================
+   ESTADO
+   ===================================================================== */
+const state = { locs:[], view:'now', loaded:false };
+
+/* =====================================================================
+   RED
+   ===================================================================== */
+function https(u){ return u.replace(/^http:\/\//,'https://'); }
+async function getJSON(url,{timeout=14000,retry=1}={}){
+  for(let a=0;a<=retry;a++){
+    const ctrl=new AbortController(); const id=setTimeout(()=>ctrl.abort(),timeout);
+    try{ const r=await fetch(https(url),{mode:'cors',signal:ctrl.signal}); clearTimeout(id);
+      if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }
+    catch(e){ clearTimeout(id); if(a===retry) throw e; await new Promise(s=>setTimeout(s,600)); }
+  }
+}
+
+async function fetchAll(){
+  const lats=LOCATIONS.map(l=>l.lat.toFixed(4)).join(',');
+  const lons=LOCATIONS.map(l=>l.lon.toFixed(4)).join(',');
+  const vars=['temperature_2m','apparent_temperature','relative_humidity_2m',
+    'precipitation_probability','precipitation','weather_code','cloud_cover','pressure_msl',
+    'visibility','wind_speed_10m','wind_gusts_10m','wind_direction_10m','uv_index','is_day'].join(',');
+  const ahora=['temperature_2m','apparent_temperature','relative_humidity_2m','precipitation',
+    'weather_code','cloud_cover','pressure_msl','wind_speed_10m','wind_gusts_10m',
+    'wind_direction_10m','is_day'].join(',');
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}`
+    +`&hourly=${vars}&timezone=auto&forecast_days=3&wind_speed_unit=kmh`;
+  try{
+    const data=await getJSON(url+`&current=${ahora}`);
+    return Array.isArray(data)?data:[data];
+  }catch(e){                                   // si el bloque actual no estuviera disponible
+    const data=await getJSON(url);
+    return Array.isArray(data)?data:[data];
+  }
+}
+
+/* =====================================================================
+   HORA OBJETIVO (con salto a mañana si ya pasó)
+   ===================================================================== */
+function targetForView(view){
+  if(view==='now'){
+    const d=new Date(), ms=d.getTime();
+    d.setMinutes(0,0,0);                       // el dato horario vigente es el de la hora en curso,
+    return { ms, dataMs:d.getTime(), rolled:false, fixed:false };   // no el de la hora mas proxima
+  }
+  const [H,M]=view.split(':').map(Number);
+  const d=new Date(); d.setHours(H,M,0,0);
+  let rolled=false;
+  if(d.getTime()<=Date.now()){ d.setDate(d.getDate()+1); rolled=true; }
+  return { ms:d.getTime(), dataMs:d.getTime(), rolled, fixed:true };
+}
+// ¿la vista de hora fija saltaría a mañana ahora mismo?
+function viewWouldRoll(view){
+  if(view==='now') return false;
+  const [H,M]=view.split(':').map(Number);
+  const d=new Date(); d.setHours(H,M,0,0);
+  return d.getTime()<=Date.now();
+}
+
+/* =====================================================================
+   EXTRACCIÓN DEL CLIMA EN UN INSTANTE
+   ===================================================================== */
+function extractAt(loc, targetMs){
+  if(!loc||!loc.hourly||!loc.hourly.time) return null;
+  const h=loc.hourly, off=(loc.utc_offset_seconds||0)*1000;
+  let best=0,diff=Infinity;
+  for(let i=0;i<h.time.length;i++){
+    const utc=Date.parse(h.time[i]+'Z')-off;
+    const dd=Math.abs(utc-targetMs);
+    if(dd<diff){diff=dd;best=i;}
+  }
+  if(diff>2*3600*1000) return null;            // fuera del horizonte fiable
+  return buildWx(h,best,off);
+}
+// Vista "ahora": bloque de observacion del servidor (paso de 15 min).
+// Lluvia %, UV y visibilidad no existen ahi: se toman de la hora en curso.
+function extractNow(loc){
+  const c=loc&&loc.current;
+  if(!c||c.temperature_2m==null||!c.time) return null;
+  const off=(loc.utc_offset_seconds||0)*1000;
+  const ms=Date.parse(c.time+'Z')-off;
+  const h=loc.hourly; let i=-1, diff=Infinity;
+  if(h&&h.time) for(let k=0;k<h.time.length;k++){
+    const d=Math.abs((Date.parse(h.time[k]+'Z')-off)-ms);
+    if(d<diff){ diff=d; i=k; }
+  }
+  const dato=(arr)=>(i>=0&&arr)?arr[i]:null;
+  const code=c.weather_code, day=c.is_day!=null ? c.is_day!==0 : true;
+  return {
+    instantMs:ms, ahora:true,
+    t:c.temperature_2m, feels:c.apparent_temperature??c.temperature_2m,
+    rh:c.relative_humidity_2m, pp:dato(h&&h.precipitation_probability)??0, mm:c.precipitation??0,
+    code, day, desc:wmoDesc(code), icon:wmoIcon(code,day),
+    cloud:c.cloud_cover??null, press:c.pressure_msl??null,
+    vis:(h&&h.visibility&&i>=0)?h.visibility[i]/1000:null,
+    wind:c.wind_speed_10m, gust:c.wind_gusts_10m??null, wdir:c.wind_direction_10m,
+    uv:dato(h&&h.uv_index)
+  };
+}
+function wxFor(loc,tg){
+  if(loc&&!tg.fixed){ const n=extractNow(loc); if(n) return n; }
+  return extractAt(loc,tg.dataMs);
+}
+function buildWx(h,i,off){
+  const code=h.weather_code[i];
+  const day=h.is_day? h.is_day[i]!==0 : true;
+  return {
+    instantMs: Date.parse(h.time[i]+'Z')-off,
+    t:h.temperature_2m[i], feels:h.apparent_temperature[i],
+    rh:h.relative_humidity_2m[i], pp:h.precipitation_probability[i]??0, mm:h.precipitation[i]??0,
+    code, day, desc:wmoDesc(code), icon:wmoIcon(code,day),
+    cloud:h.cloud_cover?h.cloud_cover[i]:null, press:h.pressure_msl[i],
+    vis:h.visibility?h.visibility[i]/1000:null,
+    wind:h.wind_speed_10m[i], gust:h.wind_gusts_10m?h.wind_gusts_10m[i]:null,
+    wdir:h.wind_direction_10m[i], uv:h.uv_index?h.uv_index[i]:null
+  };
+}
+
+/* =====================================================================
+   RENDER — selector y banner
+   ===================================================================== */
+function renderTimes(){
+  const box=document.getElementById('times');
+  box.innerHTML=TIME_VIEWS.map(v=>`
+    <button class="time-btn ${v.id===state.view?'active':''} ${viewWouldRoll(v.id)?'willroll':''}" data-view="${v.id}">
+      <span>${v.sub} ${v.label}<span class="roll"> ↪</span></span>
+      <small>${v.id==='now'?'tiempo actual':(viewWouldRoll(v.id)?'mañana':'hoy')}</small>
+    </button>`).join('');
+  box.querySelectorAll('.time-btn').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+}
+function renderBanner(){
+  const el=document.getElementById('targetText');
+  const tg=targetForView(state.view);
+  if(!tg.fixed){
+    el.innerHTML=`Mostrando: <b>ahora</b> · ${fmtFull(tg.ms)}`;
+  }else{
+    const pre=tg.rolled?'mañana':'hoy';
+    el.innerHTML=`Mostrando: <b>${pre}</b> · ${fmtFull(tg.ms)}`
+      + (tg.rolled?`<span class="tom">+1 día</span>`:'');
+  }
+}
+
+function setView(view){
+  state.view=view;
+  document.querySelectorAll('.time-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  renderBanner();
+  renderCards();
+  if(MAP.on){ mapRender(); if(MAP.sel!=null) mapInfo(MAP.sel); }
+}
+
+/* =====================================================================
+   RENDER — tarjetas
+   ===================================================================== */
+function tagHTML(loc){
+  if(!loc.tag) return '';
+  return `<span class="tag ${loc.tag==='FINAL'?'end':''}">${esc(loc.tag)}</span>`;
+}
+function skeletons(){
+  document.getElementById('grid').innerHTML=LOCATIONS.map(l=>`
+    <div class="card skeleton">
+      <div class="card-header"><div><div class="loc-name">${esc(l.name)}${tagHTML(l)}</div>
+        <div class="loc-time">cargando…</div></div></div>
+      <div class="card-body"><div class="loading"><div class="spinner"></div>Cargando tiempo…</div></div>
+    </div>`).join('');
+}
+
+function renderCards(){
+  const grid=document.getElementById('grid');
+  if(!state.loaded){ skeletons(); return; }
+  const tg=targetForView(state.view);
+  grid.innerHTML=LOCATIONS.map((loc,i)=>{
+    const w=wxFor(state.locs[i], tg);
+    if(!w) return errorCard(loc,'Sin datos para esa hora.');
+    return cardHTML(loc,i,w,tg);
+  }).join('');
+  grid.querySelectorAll('[data-evo]').forEach(b=>b.onclick=()=>openEvo(+b.dataset.evo));
+  grid.querySelectorAll('[data-retry]').forEach(b=>b.onclick=()=>load());
+}
+
+function cardHTML(loc,i,w,tg){
+  const th=thermal(w.feels);
+  const dateTag = tg.fixed && tg.rolled ? `<span class="d">${fmtDay(w.instantMs)} </span>` : '';
+  return `<div class="card">
+    <div class="card-header">
+      <div><div class="loc-name">${esc(loc.name)}${tagHTML(loc)}</div>
+        <div class="loc-time">🕒 ${dateTag}${fmtHour(w.instantMs)}</div></div>
+      <div class="ico" style="font-size:30px">${w.icon}</div>
+    </div>
+    <div class="card-body">
+      <div class="wmain">
+        <div class="ico">${w.icon}</div>
+        <div><div class="desc">${w.desc}</div>
+          <span class="therm" style="background:${th.c}">${th.t} · ${Math.round(w.feels)}°</span></div>
+      </div>
+      <div class="temps">
+        <div class="tbox"><div class="k">Temp</div><div class="v">${Math.round(w.t)}°</div></div>
+        <div class="tbox"><div class="k">Sensación</div><div class="v feels">${Math.round(w.feels)}°</div></div>
+        <div class="tbox"><div class="k">Lluvia</div><div class="v rain">${w.pp}%</div></div>
+      </div>
+      <div class="specs">
+        <div class="spec"><div class="k">Humedad</div><div class="v">${w.rh}%</div></div>
+        <div class="spec"><div class="k">Viento</div><div class="v">${Math.round(w.wind)}</div></div>
+        <div class="spec"><div class="k">Dir</div><div class="v"><span class="arrow" style="transform:rotate(${(w.wdir+180)%360}deg)">↑</span> ${compassShort(w.wdir)}</div></div>
+        <div class="spec"><div class="k">UV</div><div class="v">${w.uv!=null?Math.round(w.uv):'—'}</div></div>
+      </div>
+      <button class="evo-btn" data-evo="${i}">📈 Ver evolución por horas</button>
+    </div>
+  </div>`;
+}
+function errorCard(loc,msg){
+  return `<div class="card"><div class="card-header"><div class="loc-name">${esc(loc.name)}</div></div>
+    <div class="card-body"><div class="err">⚠️ ${esc(msg)}
+    <br><button class="retry" data-retry>Reintentar</button></div></div></div>`;
+}
+
+/* =====================================================================
+   MODAL — evolución horaria (reutiliza datos ya cargados)
+   ===================================================================== */
+function openEvo(i){
+  const loc=LOCATIONS[i], data=state.locs[i];
+  document.getElementById('modalTitle').textContent='📈 '+loc.name;
+  const body=document.getElementById('modalBody');
+  if(!data||!data.hourly){ body.innerHTML='<div class="err">Sin datos disponibles.</div>'; show(); return; }
+  const h=data.hourly, off=(data.utc_offset_seconds||0)*1000, now=Date.now();
+  // índice de la hora actual
+  let start=0,diff=Infinity;
+  for(let k=0;k<h.time.length;k++){ const d=Math.abs((Date.parse(h.time[k]+'Z')-off)-now); if(d<diff){diff=d;start=k;} }
+  const end=Math.min(h.time.length, start+30);
+  let prevDay=null, cols='';
+  for(let k=start;k<end;k++){
+    const w=buildWx(h,k,off); const th=thermal(w.feels);
+    const dayNum=new Date(w.instantMs).getDate();
+    const dtag = (prevDay!==null && dayNum!==prevDay) ? `<span class="d">${fmtDay(w.instantMs)} </span>` : '';
+    prevDay=dayNum;
+    const barH=Math.max(2,Math.round(w.pp*0.24));
+    cols+=`<div class="eh ${k===start?'now':''}">
+      <div class="hr">${dtag}${fmtHourShort(w.instantMs)}</div>
+      <div class="i">${w.icon}</div>
+      <div class="t" style="color:${th.c}" title="Sensación ${Math.round(w.feels)}°">${Math.round(w.t)}°</div>
+      <div class="rb"><i style="height:${barH}px;background:${w.pp>=50?'var(--sun)':'var(--sky)'}"></i></div>
+      <div class="rp">${w.pp}%</div>
+    </div>`;
+  }
+  body.innerHTML=`<div class="evo">${cols}</div>`;
+  show();
+}
+function show(){ document.getElementById('overlay').classList.add('on'); }
+function hide(){ document.getElementById('overlay').classList.remove('on'); }
+
+/* =====================================================================
+   FORMATO / CLIMA
+   ===================================================================== */
+function fmtFull(ms){
+  return new Date(ms).toLocaleString('es-ES',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}).replace(/\./g,'');
+}
+function fmtHour(ms){
+  return new Date(ms).toLocaleString('es-ES',{weekday:'short',hour:'2-digit',minute:'2-digit'}).replace(/\./g,'');
+}
+function fmtHourShort(ms){ return new Date(ms).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); }
+function fmtDay(ms){ return new Date(ms).toLocaleDateString('es-ES',{day:'2-digit',month:'short'}).replace(/\./g,''); }
+function compassShort(d){
+  if(d==null||isNaN(d)) return '—';
+  const dirs=['N','NE','E','SE','S','SO','O','NO'];
+  return dirs[((Math.round(d/45)%8)+8)%8];
+}
+function thermal(f){
+  if(f==null) return {t:'',c:'#5ec8ff'};
+  const r=Math.round(f);            // se clasifica sobre la cifra entera que se muestra
+  if(r<=0)  return {t:'MUY FRÍO',  c:'#4f7cff'};   //      ... 0
+  if(r<=10) return {t:'FRÍO',      c:'#5ec8ff'};   //    1 ... 10
+  if(r<=14) return {t:'FRESCO',    c:'#3ddc97'};   //   11 ... 14
+  if(r<=23) return {t:'AGRADABLE', c:'#8fe388'};   //   15 ... 23
+  if(r<=29) return {t:'CALOR',     c:'#ffb454'};   //   24 ... 29
+  return      {t:'MUCHO CALOR',    c:'#ff6b6b'};   //   30 ...
+}
+function wmoDesc(c){
+  return ({0:'Despejado',1:'Mayormente despejado',2:'Parcialmente nublado',3:'Nublado',
+    45:'Niebla',48:'Niebla con escarcha',51:'Llovizna débil',53:'Llovizna moderada',55:'Llovizna intensa',
+    56:'Llovizna helada',57:'Llovizna helada intensa',61:'Lluvia débil',63:'Lluvia moderada',65:'Lluvia fuerte',
+    66:'Lluvia helada',67:'Lluvia helada fuerte',71:'Nieve débil',73:'Nieve moderada',75:'Nieve intensa',
+    77:'Granos de nieve',80:'Chubascos débiles',81:'Chubascos moderados',82:'Chubascos torrenciales',
+    85:'Chubascos de nieve',86:'Chubascos de nieve intensos',95:'Tormenta',96:'Tormenta con granizo',
+    99:'Tormenta con granizo fuerte'}[c])||'Condición desconocida';
+}
+function wmoIcon(c,day){
+  if(c===0) return day?'☀️':'🌙';
+  if(c===1) return day?'🌤️':'🌙';
+  if(c===2) return day?'⛅':'☁️';
+  if(c===3) return '☁️';
+  if(c===45||c===48) return '🌫️';
+  if([51,53,55,56,57].includes(c)) return '🌦️';
+  if([61,63,65,66,67,80,81].includes(c)) return '🌧️';
+  if(c===82) return '⛈️';
+  if([71,73,77,85].includes(c)) return '🌨️';
+  if([75,86].includes(c)) return '❄️';
+  if([95,96,99].includes(c)) return '⛈️';
+  return '🌤️';
+}
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function toast(msg,type){
+  const c=document.getElementById('toasts'); const t=document.createElement('div');
+  t.className='toast '+(type||'ok'); t.textContent=msg; c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},4500);
+}
+
+/* =====================================================================
+   CARGA
+   ===================================================================== */
+async function load(){
+  const btn=document.getElementById('refresh'); btn.classList.add('spin');
+  state.loaded=false; renderCards();
+  try{
+    state.locs=await fetchAll();
+    state.loaded=true;
+    renderCards();
+    if(MAP.on){ mapRender(); if(MAP.sel!=null) mapInfo(MAP.sel); }
+  }catch(e){
+    state.loaded=true; state.locs=[];
+    document.getElementById('grid').innerHTML=LOCATIONS.map(l=>errorCard(l,'No se pudo cargar el tiempo.')).join('');
+    document.querySelectorAll('[data-retry]').forEach(b=>b.onclick=()=>load());
+    if(MAP.on){ mapRender(); if(MAP.sel!=null) mapInfo(MAP.sel); }
+    toast('No se pudo cargar el tiempo. Comprueba tu conexión.','err');
+  }finally{ btn.classList.remove('spin'); }
+}
+
+function tickClock(){
+  document.getElementById('clock').textContent='📅 '+fmtFull(Date.now());
+  renderTimes(); renderBanner();   // recalcula etiquetas hoy/mañana por si cambia el minuto
+  if(MAP.on){ mapRender(); if(MAP.sel!=null) mapInfo(MAP.sel); }
+}
+
+
+/* =====================================================================
+   MAPA — motor mínimo de teselas OSM (sin librerías ni CDN)
+   Traza obtenida del recorrido a pie San Rogelio → CEPA Tetuán
+   ===================================================================== */
+const ROUTE=[[40.45146,-3.70989],[40.45193,-3.70947],[40.45229,-3.70889],[40.45281,-3.70838],
+  [40.45318,-3.70829],[40.45557,-3.70573],[40.45586,-3.70557],[40.45648,-3.70479],[40.45673,-3.70435],
+  [40.45738,-3.70202],[40.45782,-3.70170],[40.45894,-3.70244],[40.46247,-3.69992],[40.46573,-3.69790],
+  [40.46640,-3.69770],[40.46717,-3.69720],[40.46782,-3.69783],[40.46803,-3.69826]];
+
+const TS=256, TILEURL='https://tile.openstreetmap.org/';
+const MAP={z:15,cx:0,cy:0,on:false,sel:null,ready:false,cache:new Map()};
+
+function lon2px(lon,z){ return (lon+180)/360*Math.pow(2,z)*TS; }
+function lat2px(lat,z){ const s=Math.sin(lat*Math.PI/180);
+  return (0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*Math.pow(2,z)*TS; }
+function px2lon(x,z){ return x/(Math.pow(2,z)*TS)*360-180; }
+function px2lat(y,z){ const n=Math.PI-2*Math.PI*y/(Math.pow(2,z)*TS);
+  return 180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))); }
+
+function mapFit(){
+  const el=document.getElementById('map');
+  const W=el.clientWidth||600, H=el.clientHeight||420;
+  const la=LOCATIONS.map(l=>l.lat), lo=LOCATIONS.map(l=>l.lon);
+  const N=Math.max.apply(null,la), S=Math.min.apply(null,la);
+  const E=Math.max.apply(null,lo), O=Math.min.apply(null,lo);
+  // ancho/alto del trayecto en pixeles de zoom 0; el zoom es fraccionario
+  const sx=lon2px(E,0)-lon2px(O,0), sy=lat2px(S,0)-lat2px(N,0);
+  const z=Math.min(Math.log2(Math.max(W-96,80)/sx), Math.log2(Math.max(H-96,80)/sy));
+  MAP.z=Math.max(11,Math.min(19,z));
+  MAP.cx=(lon2px(E,MAP.z)+lon2px(O,MAP.z))/2;
+  MAP.cy=(lat2px(S,MAP.z)+lat2px(N,MAP.z))/2;
+}
+
+function mapRender(){
+  const el=document.getElementById('map'); if(!el||!MAP.on) return;
+  const W=el.clientWidth, H=el.clientHeight, z=MAP.z;
+  const ox=MAP.cx-W/2, oy=MAP.cy-H/2;
+
+  /* teselas: se sirven al zoom entero mas cercano y se escalan */
+  const Z=Math.max(0,Math.min(19,Math.round(z))), k=Math.pow(2,z-Z), TP=TS*k, wmax=Math.pow(2,Z);
+  const layer=document.getElementById('tiles'), keep=new Set();
+  for(let tx=Math.floor(ox/TP); tx<=Math.floor((ox+W)/TP); tx++){
+    for(let ty=Math.floor(oy/TP); ty<=Math.floor((oy+H)/TP); ty++){
+      if(ty<0||ty>=wmax) continue;
+      const wx=((tx%wmax)+wmax)%wmax, id=Z+':'+tx+':'+ty;
+      keep.add(id);
+      let img=MAP.cache.get(id);
+      if(!img){
+        img=new Image(); img.decoding='async'; img.alt='';
+        img.referrerPolicy='strict-origin-when-cross-origin';   // OSM exige Referer (403 si falta)
+        img.onerror=()=>{ img.style.visibility='hidden'; };
+        img.src=TILEURL+Z+'/'+wx+'/'+ty+'.png';
+        MAP.cache.set(id,img); layer.appendChild(img);
+      }
+      img.style.left  =Math.round(tx*TP-ox)+'px';
+      img.style.top   =Math.round(ty*TP-oy)+'px';
+      img.style.width =Math.ceil(TP)+1+'px';
+      img.style.height=Math.ceil(TP)+1+'px';
+    }
+  }
+  MAP.cache.forEach((img,id)=>{ if(!keep.has(id)){ img.remove(); MAP.cache.delete(id); } });
+
+  /* colocacion de etiquetas: laterales, alternando lado y altura para no pisarse */
+  const BW=128, BH=42, GAP=18, SALTO=BH+6, tg=targetForView(state.view), colocadas=[];
+  LOCATIONS.forEach((loc,i)=>{
+    const x=lon2px(loc.lon,z)-ox, y=lat2px(loc.lat,z)-oy;
+    if(x<-40||x>W+40||y<-40||y>H+40) return;
+    let sitio=null, peor=null, peorArea=Infinity;
+    for(const dy of [0,-SALTO,SALTO,-2*SALTO,2*SALTO,-3*SALTO,3*SALTO]){
+      for(const lado of [1,-1]){
+        const l=lado>0 ? x+GAP : x-GAP-BW, t=y+dy-BH/2;
+        if(l<2||l+BW>W-2||t<2||t+BH>H-2) continue;      // nunca fuera del lienzo
+        const c={l:l,t:t,r:l+BW,b:t+BH};
+        let area=0;
+        colocadas.forEach(q=>{
+          const w2=Math.min(c.r,q.c.r)-Math.max(c.l,q.c.l), h2=Math.min(c.b,q.c.b)-Math.max(c.t,q.c.t);
+          if(w2>0&&h2>0) area+=w2*h2;
+        });
+        if(area===0){ sitio={c:c,lado:lado}; break; }
+        if(area<peorArea){ peorArea=area; peor={c:c,lado:lado}; }   // la menos mala
+      }
+      if(sitio) break;
+    }
+    if(!sitio) sitio=peor;
+    if(!sitio){ const l=x+GAP, t=y-BH/2; sitio={c:{l:l,t:t,r:l+BW,b:t+BH},lado:1}; }
+    sitio.i=i; sitio.x=x; sitio.y=y; colocadas.push(sitio);
+  });
+
+  /* trazado del recorrido + lineas guia de cada etiqueta */
+  const d='M'+ROUTE.map(p=>(lon2px(p[1],z)-ox).toFixed(1)+' '+(lat2px(p[0],z)-oy).toFixed(1)).join('L');
+  const guias=colocadas.map(s2=>'<line class="lk" x1="'+s2.x.toFixed(1)+'" y1="'+s2.y.toFixed(1)
+      +'" x2="'+(s2.lado>0?s2.c.l:s2.c.r).toFixed(1)+'" y2="'+((s2.c.t+s2.c.b)/2).toFixed(1)+'"/>').join('');
+  document.getElementById('mapSvg').innerHTML=
+    '<path class="rt-b" d="'+d+'"/><path class="rt" d="'+d+'"/>'+guias;
+
+  /* chinchetas */
+  const box=document.getElementById('pins'); box.innerHTML='';
+  colocadas.forEach(s2=>{
+    const i=s2.i, loc=LOCATIONS[i];
+    const w=state.loaded?wxFor(state.locs[i],tg):null;
+    const th=w?thermal(w.feels):null;
+    const cls=loc.tag==='INICIO'?' ini':(loc.tag==='FINAL'?' fin':'');
+    const el2=document.createElement('div');
+    el2.className='pin'+cls+(MAP.sel===i?' sel':'');
+    el2.style.left=s2.x+'px'; el2.style.top=s2.y+'px';
+    el2.title=loc.name;
+    el2.innerHTML='<div class="dot"></div>'
+      +'<div class="bub" style="left:'+(s2.c.l-s2.x).toFixed(0)+'px;top:'+(s2.c.t-s2.y).toFixed(0)+'px">'
+      +'<div class="l1"><span class="n">'+(i+1)+'</span>'
+      +'<span>'+(w?w.icon:'⏳')+'</span>'
+      +'<span class="tv" style="color:'+(th?th.c:'var(--faint)')+'">'+(w?Math.round(w.t)+'°':'—')+'</span>'
+      +(w?'<span class="rain">💧'+w.pp+'%</span>':'')+'</div>'
+      +(w&&th.t?'<div class="l2" style="background:'+th.c+'">'+th.t+'</div>':'')
+      +'</div>';
+    el2.onclick=e=>{ e.stopPropagation(); MAP.sel=i; mapRender(); mapInfo(i); };
+    box.appendChild(el2);
+  });
+}
+
+function mapInfo(i){
+  const box=document.getElementById('mapInfo');
+  if(i==null){ box.innerHTML='Toca una chincheta para ver el detalle de ese punto. '
+    +'Arrastra para mover el mapa y usa + / − para acercar.'; return; }
+  const loc=LOCATIONS[i], tg=targetForView(state.view);
+  const w=state.loaded?wxFor(state.locs[i],tg):null;
+  if(!w){ box.innerHTML='<div class="t">'+esc(loc.name)+'</div><div class="sub">Sin datos para esa hora.</div>'; return; }
+  const th=thermal(w.feels);
+  box.innerHTML='<div class="t">'+w.icon+' '+(i+1)+'. '+esc(loc.name)+(loc.tag?' <span class="tag'
+      +(loc.tag==='FINAL'?' end':'')+'">'+loc.tag+'</span>':'')+'</div>'
+    +'<div class="sub">🕒 '+fmtHour(w.instantMs)+' · '+w.desc
+      +' <span class="therm" style="background:'+th.c+'">'+th.t+'</span></div>'
+    +'<div class="row"><span>Temp <b style="color:'+th.c+'">'+Math.round(w.t)+'°</b></span>'
+    +'<span>Sensación <b>'+Math.round(w.feels)+'°</b></span>'
+    +'<span>Lluvia <b>'+w.pp+'%</b></span>'
+    +'<span>Humedad <b>'+w.rh+'%</b></span>'
+    +'<span>Viento <b>'+Math.round(w.wind)+' km/h '+compassShort(w.wdir)+'</b></span>'
+    +'<span>UV <b>'+(w.uv!=null?Math.round(w.uv):'—')+'</b></span></div>'
+    +'<button class="evo2" data-evo2="'+i+'">📈 Ver evolución por horas</button>';
+  const b=box.querySelector('[data-evo2]'); if(b) b.onclick=()=>openEvo(i);
+}
+
+let RAF=0;
+function mapPaint(){ if(!RAF) RAF=requestAnimationFrame(()=>{ RAF=0; mapRender(); }); }
+
+function mapZoom(dz,ev){
+  const el=document.getElementById('map'), r=el.getBoundingClientRect();
+  const nz=Math.max(11,Math.min(19,MAP.z+dz)); if(Math.abs(nz-MAP.z)<1e-9) return;
+  const px=ev?ev.clientX-r.left:r.width/2, py=ev?ev.clientY-r.top:r.height/2;
+  const lon=px2lon(MAP.cx-r.width/2+px,MAP.z), lat=px2lat(MAP.cy-r.height/2+py,MAP.z);
+  MAP.z=nz;
+  MAP.cx=lon2px(lon,nz)+(r.width/2-px);
+  MAP.cy=lat2px(lat,nz)+(r.height/2-py);
+  mapPaint();
+}
+
+function mapBind(){
+  const el=document.getElementById('map');
+  const dedos=new Map(); let sep0=0;
+  const sep=()=>{ const a=[...dedos.values()]; return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y); };
+  const medio=()=>{ const a=[...dedos.values()];
+    return {clientX:(a[0].x+a[1].x)/2, clientY:(a[0].y+a[1].y)/2}; };
+
+  el.addEventListener('pointerdown',e=>{
+    // los botones y las chinchetas viven dentro del mapa: si capturamos el puntero
+    // aqui, el navegador les roba el click
+    if(e.target.closest&&e.target.closest('.mapctl,.pin,.attrib')) return;
+    dedos.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    el.setPointerCapture(e.pointerId); el.classList.add('drag');
+    if(dedos.size===2) sep0=sep();
+  });
+  el.addEventListener('pointermove',e=>{
+    const d=dedos.get(e.pointerId); if(!d) return;
+    const dx=e.clientX-d.x, dy=e.clientY-d.y;
+    d.x=e.clientX; d.y=e.clientY;
+    if(dedos.size>=2){
+      const s1=sep();
+      if(sep0>0&&s1>0) mapZoom(Math.log2(s1/sep0),medio());
+      sep0=s1;
+    }else{
+      MAP.cx-=dx; MAP.cy-=dy; mapPaint();
+    }
+  });
+  const suelta=e=>{
+    dedos.delete(e.pointerId);
+    if(dedos.size<2) sep0=0;
+    if(!dedos.size) el.classList.remove('drag');
+  };
+  el.addEventListener('pointerup',suelta);
+  el.addEventListener('pointercancel',suelta);
+  el.addEventListener('wheel',e=>{ e.preventDefault(); mapZoom(e.deltaY<0?0.5:-0.5,e); },{passive:false});
+  document.getElementById('zIn').onclick =()=>mapZoom(1);
+  document.getElementById('zOut').onclick=()=>mapZoom(-1);
+  document.getElementById('zFit').onclick=()=>{ MAP.sel=null; mapFit(); mapRender(); mapInfo(null); };
+  window.addEventListener('resize',mapPaint);
+}
+
+function toggleMap(){
+  MAP.on=!MAP.on;
+  document.getElementById('mapWrap').hidden=!MAP.on;
+  document.getElementById('cardsWrap').hidden=MAP.on;
+  const b=document.getElementById('mapBtn');
+  b.classList.toggle('on',MAP.on);
+  b.textContent=MAP.on?'🗂️ TARJETAS':'🗺️ MAPA';
+  if(MAP.on){
+    if(!MAP.ready){ MAP.ready=true; mapBind(); mapFit(); mapInfo(null); }
+    mapRender();
+  }
+}
+
+/* =====================================================================
+   ARRANQUE
+   ===================================================================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  renderTimes(); renderBanner(); tickClock();
+  document.getElementById('refresh').onclick=load;
+  document.getElementById('mapBtn').onclick=toggleMap;
+  document.getElementById('modalClose').onclick=hide;
+  document.getElementById('overlay').onclick=e=>{ if(e.target.id==='overlay') hide(); };
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') hide(); });
+  // re-renderiza al re-seleccionar la misma vista tras refresco no hace falta
+  setInterval(tickClock,60000);
+  load();
+});
+</script>
+</body>
+</html>
